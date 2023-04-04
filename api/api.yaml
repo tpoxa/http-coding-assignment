@@ -1,0 +1,108 @@
+openapi: "3.0.0"
+info:
+  title: JWThenticator
+  version: 1.0.0
+paths:
+
+  /health:
+    get:
+      description: Get request to see the server is responding. This is can be used by Docker or K8S health checks.
+      operationId: check_health
+      responses:
+        "200":
+          description: Working
+
+
+  /auth:
+    post:
+      description: Authenticate using username and pasword.
+      operationId: authenticate
+      requestBody:
+        description: Authentication credentials
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        "200":
+          description: Authentication successfull
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+              example:
+                token: "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJ0b2tlbl9pZCI6IjkxOWY4OWI4OTBkYjRlNjg5MzA3YzgyYTQ1MjE5Yjg4IiwiaWRlbnRpZmllciI6ImhlbGxvIiwiaWF0IjoxNjAwNjc0ODk2LCJleHAiOjE2MDA2NzY2OTZ9.TRXxbCweJRQlaV_jm2TFlNftfrA0Q5qrPtnMZx_r3y2ZUxIbZQw07n01QM43MTew0Zq9ExftNZbCd0vol8XT7wMakZvZDPokd7Gt9vd5fANWr1LHM-nDx4RVUqA4TfSwPVROrxZjwannsNZ74TCAZMXbmv3p2ZguVRXMnBL1i5F2I8hAweMz26IFuQkfvhTLy5OA-WFVwAvo24X4cAfk2z-QvAcgcrtKNF66UhNCdUdyB7it2SoqNr0qo8GuZuZNB-ej8wM4n189vW_nrV1P2xf0hWyL4adpXZtOUB0gAngGETh4W2YM8sByAp7f2EeNSCwptflHPupvR9fce3ZuOw"
+        "400":
+          description: Invalid request
+        "401":
+          description: Username or password is incorrect.
+
+  /sum:
+    post:
+      security:
+        - bearerAuth: []
+      description: Gets the sum of all numbers which JSON object may contain.
+      operationId: sum
+      requestBody:
+        description: The arbitrary JSON document
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SumRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SumResponse"
+              example:
+                sum: 142
+        "400":
+          description: Invalid request
+        "401":
+          description: Aunauthorised
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: A unique username
+        password:
+          type: string
+          description: Password
+
+    AuthResponse:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          description: A valid JWT that can be used for access.
+
+    SumRequest:
+      type: object
+
+
+    SumResponse:
+      type: object
+      required:
+        - sum
+      properties:
+        sum:
+          type: number
